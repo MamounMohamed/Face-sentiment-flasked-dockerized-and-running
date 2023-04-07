@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Facial Sentiment Detection</title>
+</head>
+<body>
+    <h1>Facial Sentiment Detection</h1>
+    <div>
+        <video id="video_feed" width="640" height="480"></video>
+        <h2>Detected Sentiment: <span id="sentiment"></span></h2>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        var video = document.getElementById("video_feed");
+        var canvas = document.createElement('canvas');
+        canvas.width = 640;
+        canvas.height = 480;
+        var context = canvas.getContext('2d');
+        navigator.mediaDevices.getUserMedia({video: true}).then(function(stream) {
+            video.srcObject = stream;
+            video.play();
+            setInterval(function(){
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                var dataURL = canvas.toDataURL();
+                $.post("/", {image: dataURL.split(',')[1]}, function(response){
+                    $('#sentiment').text(response.sentiment);
+                });
+            }, 100);
+        });
+    </script>
+</body>
+</html>
